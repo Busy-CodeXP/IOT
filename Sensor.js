@@ -1,15 +1,14 @@
 const five = require("johnny-five");
-const request = require("request");
 const board = new five.Board({
-    port: ""
+    port: "COM4"
 
 });
 
-var entrar;
-var saida;
-var final;
+var entrar = 0;
+var saida = 0;
 var ObstaculoEntrada = false;
 var ObstaculoSaida = false;
+var final;
 
 board.on("ready", function () {
     var SensorEntrada = new five.Proximity({
@@ -26,33 +25,38 @@ board.on("ready", function () {
 
     SensorEntrada.on("data", function () {
 
-        var ObstaculoEntrado = this.cm < 15;
+        var ObstaculoEntrando = this.cm < 15;
+
         if (ObstaculoEntrada && !ObstaculoEntrando) {
             entrar++;
         }
 
-        ObstaculoEntrada = TemObstaculo;
+        ObstaculoEntrada = ObstaculoEntrando;
+
+        console.log("Número de pessoas que entraram :");
+        console.log(entrar);
     })
 
     SensorSaida.on("data", function () {
 
         var ObstaculoSaindo = this.cm < 15;
+
         if (ObstaculoSaida && !ObstaculoSaindo) {
             saida++;
         }
 
-        ObstaculoSaindo = ObstaculoSaida;
+        ObstaculoSaida = ObstaculoSaindo;
+        console.log("Número de pessoas que sairam: ");
+        console.log(saida);
 
         final = (entrar - saida);
         if (final <= 0) {
             saida = 0;
             entrar = 0;
         }
-        console.log("Número de pessoas que entraram :");
-        console.log(entrar);
-        console.log("Número de pessoas que sairam: ");
-        console.log(saida);
-        console.log("Número de pessoas que estão no busão");
+        
+        
+        console.log("Número de pessoas que estão no busão: ");
         console.log(final);
 
     })
