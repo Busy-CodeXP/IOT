@@ -1,4 +1,4 @@
 module.exports = {
     id: "",
-    api: ''
+    api: 'URL'
 };
