@@ -6,8 +6,10 @@ const board = new five.Board({
 
 var entrar = 0;
 var saida = 0;
+
 var ObstaculoEntrada = false;
 var ObstaculoSaida = false;
+
 var final;
 const configuracao = require("./modulo-api");
 const id = configuracao.id;
@@ -38,9 +40,18 @@ board.on("ready", function () {
 
         console.log("Número de pessoas que entraram :");
         console.log(entrar);
-        const DadosEntrada = {
-            valor: entrar
-        };
+
+        request.put(UpdateSensor + "/entrada_saida", {
+            json: true,
+            body: {
+                "acao": 0 // 0 = Entrada
+            }
+        }, function (error, res, body) {
+            if (error) {
+                consolo.error(error);
+                return;
+            }
+        });
     });
 
     SensorSaida.on("data", function () {
@@ -54,10 +65,21 @@ board.on("ready", function () {
         ObstaculoSaida = ObstaculoSaindo;
         console.log("Número de pessoas que sairam: ");
         console.log(saida);
-        const DadosSaida = {
-            valor: saida
-        };
 
+        request.put(UpdateSensor + "/entrada_saida", {
+            json: true,
+            body: {
+                "acao": 1 // 1 = Saída
+            }
+        }, function (error, res, body) {
+            if (error) {
+                consolo.error(error);
+                return;
+            }
+        });
+    });
+
+    setInterval(function () {
         final = (entrar - saida);
         if (final <= 0) {
             saida = 0;
@@ -67,34 +89,16 @@ board.on("ready", function () {
         console.log(final);
         const dados = {
             valor: final
-
         };
 
-        request.put(UpdateSensor, {
+        request.put(UpdateSensor + "/total", {
             json: true,
             body: {
                 "entradas": DadosEntrada,
                 "saidas": DadosSaida,
                 "total": dados
             }
-        }, function (erros, res, body) {
-            if (error) {
-                consolo.error(error);
-                return;
-            }
-        });
-
-    });
-
-    setInterval(function () {
-        request.put(UpdateSensor, {
-            json: true,
-            body: {
-                "entradas": DadosEntrada,
-                "saidas": DadosSaida,
-                "total": dados
-            }
-        }, function (erros, res, body) {
+        }, function (error, res, body) {
             if (error) {
                 consolo.error(error);
                 return;
