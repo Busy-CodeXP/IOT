@@ -1,4 +1,5 @@
 const five = require("johnny-five");
+const request = require('request');
 const board = new five.Board({
     port: "COM4"
 
@@ -14,7 +15,7 @@ var final;
 const configuracao = require("./modulo-api");
 const id = configuracao.id;
 const api = configuracao.api;
-const UpdateSensor = apt + "/api/Sensor/" + id;
+const UpdateSensor = api + "api/Sensor/" + id;
 
 board.on("ready", function () {
     var SensorEntrada = new five.Proximity({
@@ -48,7 +49,7 @@ board.on("ready", function () {
             }
         }, function (error, res, body) {
             if (error) {
-                consolo.error(error);
+                console.error(error);
                 return;
             }
         });
@@ -73,7 +74,7 @@ board.on("ready", function () {
             }
         }, function (error, res, body) {
             if (error) {
-                consolo.error(error);
+                console.error(error);
                 return;
             }
         });
@@ -91,18 +92,17 @@ board.on("ready", function () {
             valor: final
         };
 
+        console.log(UpdateSensor + "/total");
         request.put(UpdateSensor + "/total", {
             json: true,
-            body: {
-                "entradas": DadosEntrada,
-                "saidas": DadosSaida,
-                "total": dados
-            }
+            body: dados
         }, function (error, res, body) {
             if (error) {
-                consolo.error(error);
+                console.error(error);
                 return;
             }
+            console.log("enviado", dados);
+            console.log(res.statusCode);
         });
     }, 5000);
 
