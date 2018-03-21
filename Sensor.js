@@ -21,12 +21,12 @@ board.on("ready", function () {
     var SensorEntrada = new five.Proximity({
         controller: "HCSR04",
         pin: 7,
-        freq: 1000
+        freq: 5000
     })
     var SensorSaida = new five.Proximity({
         controller: "HCSR04",
         pin: 6,
-        freq: 1000
+        freq: 5000
     })
 
     SensorEntrada.on("data", function () {
