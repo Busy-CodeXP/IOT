@@ -30,6 +30,7 @@ board.on("ready", function () {
 
     function reportaStatus(status){
         ledCarregando.stop();
+        ledCarregando.off();
         ledSucesso.off();
         ledErro.off();
 
@@ -46,6 +47,15 @@ board.on("ready", function () {
             default:
                 break;
         }
+    }
+    function tratarResposta (error, res, body) {
+        if (error || res.statusCode != 200) {
+            console.error(error || res.statusCode);
+            reportaStatus(apiStatus.erro);
+            return;
+        }
+        reportaStatus(apiStatus.sucesso);
+        console.log(res.statusCode);
     }
 
     var SensorEntrada = new five.Proximity({
@@ -78,14 +88,7 @@ board.on("ready", function () {
             body: {
                 "acao": 0 // 0 = Entrada
             }
-        }, function (error, res, body) {
-            if (error) {
-                console.error(error);
-                reportaStatus(apiStatus.erro);
-                return;
-            }
-            reportaStatus(apiStatus.sucesso);
-        });
+        }, tratarResposta);
     });
 
     SensorSaida.on("data", function () {
@@ -106,14 +109,7 @@ board.on("ready", function () {
             body: {
                 "acao": 1 // 1 = Saída
             }
-        }, function (error, res, body) {
-            if (error) {
-                console.error(error);
-                reportaStatus(apiStatus.erro);
-                return;
-            }
-            reportaStatus(apiStatus.sucesso);
-        });
+        }, tratarResposta);
     });
 
     setInterval(function () {
@@ -133,15 +129,6 @@ board.on("ready", function () {
         request.put(UpdateSensor + "/total", {
             json: true,
             body: dados
-        }, function (error, res, body) {
-            if (error) {
-                console.error(error);
-                reportaStatus(apiStatus.erro);
-                return;
-            }
-            reportaStatus(apiStatus.sucesso);
-            console.log("enviado", dados);
-            console.log(res.statusCode);
-        });
+        }, tratarResposta);
     }, 5000);
 });
