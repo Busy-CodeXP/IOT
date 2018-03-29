@@ -18,14 +18,44 @@ const api = configuracao.api;
 const UpdateSensor = api + "api/Sensor/" + id;
 
 board.on("ready", function () {
+
+    var ledSucesso = new five.Led(9); // verde
+    var ledCarregando = new five.Led(10); // amarelo
+    var ledErro = new five.Led(8); // vermelho
+    var apiStatus = {
+        sucesso: "sucesso",
+        erro: "erro",
+        carregando: "carregando"  
+    }
+
+    function reportaStatus(status){
+        ledCarregando.stop();
+        ledSucesso.off();
+        ledErro.off();
+
+        switch (status) {
+            case apiStatus.erro:
+                ledErro.on();
+                break;
+            case apiStatus.sucesso:
+                ledSucesso.on();
+                break;
+            case apiStatus.carregando:
+                ledCarregando.blink();
+                break;
+            default:
+                break;
+        }
+    }
+
     var SensorEntrada = new five.Proximity({
         controller: "HCSR04",
-        pin: 7,
+        pin: 6,
         freq: 5000
     })
     var SensorSaida = new five.Proximity({
         controller: "HCSR04",
-        pin: 6,
+        pin: 7,
         freq: 5000
     })
 
@@ -42,6 +72,7 @@ board.on("ready", function () {
         console.log("Número de pessoas que entraram :");
         console.log(entrar);
 
+        reportaStatus(apiStatus.carregando);
         request.put(UpdateSensor + "/entrada_saida", {
             json: true,
             body: {
@@ -50,8 +81,10 @@ board.on("ready", function () {
         }, function (error, res, body) {
             if (error) {
                 console.error(error);
+                reportaStatus(apiStatus.erro);
                 return;
             }
+            reportaStatus(apiStatus.sucesso);
         });
     });
 
@@ -67,6 +100,7 @@ board.on("ready", function () {
         console.log("Número de pessoas que sairam: ");
         console.log(saida);
 
+        reportaStatus(apiStatus.carregando);
         request.put(UpdateSensor + "/entrada_saida", {
             json: true,
             body: {
@@ -75,8 +109,10 @@ board.on("ready", function () {
         }, function (error, res, body) {
             if (error) {
                 console.error(error);
+                reportaStatus(apiStatus.erro);
                 return;
             }
+            reportaStatus(apiStatus.sucesso);
         });
     });
 
@@ -93,17 +129,19 @@ board.on("ready", function () {
         };
 
         console.log(UpdateSensor + "/total");
+        reportaStatus(apiStatus.carregando);
         request.put(UpdateSensor + "/total", {
             json: true,
             body: dados
         }, function (error, res, body) {
             if (error) {
                 console.error(error);
+                reportaStatus(apiStatus.erro);
                 return;
             }
+            reportaStatus(apiStatus.sucesso);
             console.log("enviado", dados);
             console.log(res.statusCode);
         });
     }, 5000);
-
 });
