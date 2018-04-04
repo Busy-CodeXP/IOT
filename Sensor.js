@@ -1,6 +1,8 @@
 const five = require("johnny-five");
 const request = require('request');
-const board = new five.Board();
+const board = new five.Board({
+    port: "COM4"
+});
 
 var entrar = 0;
 var saida = 0;
@@ -55,25 +57,17 @@ board.on("ready", function () {
         console.log(res.statusCode);
     }
 
-    var SensorEntrada = new five.Proximity({
-        controller: "HCSR04",
-        pin: 6,
-        freq: 1000
-    })
-    var SensorSaida = new five.Proximity({
-        controller: "HCSR04",
-        pin: 7,
-        freq: 1000
-    })
+    var BotaoEntrada = new five.Button(6);
+    var BotaoSaida = new five.Button(7);
 
-    SensorEntrada.on("data", function () {
-        var ObstaculoEntrando = this.cm < 15;
+    BotaoEntrada.on("down", function () {
+        //var ObstaculoEntrando = BotaoEntrada("up");
 
-        if (ObstaculoEntrada && !ObstaculoEntrando) {
+        //if (ObstaculoEntrada && !ObstaculoEntrando) {
             entrar++;
-        }
+        //}
 
-        ObstaculoEntrada = ObstaculoEntrando;
+        //ObstaculoEntrada = ObstaculoEntrando;
 
         console.log("Número de pessoas que entraram :");
         console.log(entrar);
@@ -87,14 +81,14 @@ board.on("ready", function () {
         }, tratarResposta);
     });
 
-    SensorSaida.on("data", function () {
-        var ObstaculoSaindo = this.cm < 15;
+    BotaoSaida.on("up", function () {
+        //var ObstaculoSaindo = BotaoSaida("up");
 
-        if (ObstaculoSaida && !ObstaculoSaindo) {
+        //if (ObstaculoSaida && !ObstaculoSaindo) {
             saida++;
-        }
+       // }
 
-        ObstaculoSaida = ObstaculoSaindo;
+        //ObstaculoSaida = ObstaculoSaindo;
         console.log("Número de pessoas que sairam: ");
         console.log(saida);
 
@@ -107,23 +101,23 @@ board.on("ready", function () {
         }, tratarResposta);
     });
 
-    setInterval(function () {
-        final = (entrar - saida);
-        if (final <= 0) {
-            saida = 0;
-            entrar = 0;
-        }
-        console.log("Número de pessoas que estão no busão: ");
-        console.log(final);
-        const dados = {
-            valor: final
-        };
+    // setInterval(function () {
+    //     final = (entrar - saida);
+    //     if (final <= 0) {
+    //         saida = 0;
+    //         entrar = 0;
+    //     }
+    //     console.log("Número de pessoas que estão no busão: ");
+    //     console.log(final);
+    //     const dados = {
+    //         valor: final
+    //     };
 
-        console.log(UpdateSensor + "/total");
-        reportaStatus(apiStatus.carregando);
-        request.put(UpdateSensor + "/total", {
-            json: true,
-            body: dados
-        }, tratarResposta);
-    }, 5000);
+    //     console.log(UpdateSensor + "/total");
+    //     reportaStatus(apiStatus.carregando);
+    //     request.put(UpdateSensor + "/total", {
+    //         json: true,
+    //         body: dados
+    //     }, tratarResposta);
+    // }, 5000);
 });
