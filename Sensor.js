@@ -1,9 +1,6 @@
 const five = require("johnny-five");
 const request = require('request');
-const board = new five.Board({
-    port: "COM4"
-
-});
+const board = new five.Board();
 
 var entrar = 0;
 var saida = 0;
@@ -15,7 +12,7 @@ var final;
 const configuracao = require("./modulo-api");
 const id = configuracao.id;
 const api = configuracao.api;
-const UpdateSensor = api + "api/Sensor/" + id;
+const UpdateSensor = api + "/api/Sensor/" + id;
 
 board.on("ready", function () {
 
@@ -61,16 +58,15 @@ board.on("ready", function () {
     var SensorEntrada = new five.Proximity({
         controller: "HCSR04",
         pin: 6,
-        freq: 5000
+        freq: 1000
     })
     var SensorSaida = new five.Proximity({
         controller: "HCSR04",
         pin: 7,
-        freq: 5000
+        freq: 1000
     })
 
     SensorEntrada.on("data", function () {
-
         var ObstaculoEntrando = this.cm < 15;
 
         if (ObstaculoEntrada && !ObstaculoEntrando) {
@@ -92,7 +88,6 @@ board.on("ready", function () {
     });
 
     SensorSaida.on("data", function () {
-
         var ObstaculoSaindo = this.cm < 15;
 
         if (ObstaculoSaida && !ObstaculoSaindo) {
