@@ -1,4 +1,4 @@
 module.exports = {
-    id: "20",
-    api: 'http://bc989699.ngrok.io'
+    id: "49",
+    api: 'http://buzy.azurewebsites.net'
 };
